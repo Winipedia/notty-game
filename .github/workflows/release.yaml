@@ -50,7 +50,6 @@ jobs:
     - name: Install Pygame System Dependencies
       id: install_pygame_system_dependencies
       run: sudo apt-get update && sudo apt-get install -y libsdl2-dev libfreetype6-dev
-      if: runner.os == 'Linux'
     - name: Install Python Dependencies
       id: install_python_dependencies
       run: poetry install
@@ -113,7 +112,6 @@ jobs:
     - name: Install Pygame System Dependencies
       id: install_pygame_system_dependencies
       run: sudo apt-get update && sudo apt-get install -y libsdl2-dev libfreetype6-dev
-      if: runner.os == 'Linux'
     - name: Install Python Dependencies
       id: install_python_dependencies
       run: poetry install

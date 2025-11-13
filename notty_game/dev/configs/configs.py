@@ -47,7 +47,6 @@ class NottyGameWorkflowMixin(WinipediaWorkflow):
         return cls.get_step(
             step_func=cls.step_install_pygame_system_dependencies,
             run="sudo apt-get update && sudo apt-get install -y libsdl2-dev libfreetype6-dev",  # noqa: E501
-            if_condition="runner.os == 'Linux'",
         )
 
 
