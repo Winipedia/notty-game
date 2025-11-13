@@ -1589,5 +1589,5 @@ types-tqdm = "*"
 
 [metadata]
 lock-version = "2.1"
-python-versions = ">=3.12"
-content-hash = "4a6a6f6077c2eb80bc9bde25bcb21f219d7151b0f3470cf9641b5cc85d1d0d71"
+python-versions = ">=3.12,<3.13"
+content-hash = "f930c1baed968a8c06918f13b7262fc815d6789432e47b1071e6041081c2fb2c"
