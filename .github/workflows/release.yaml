@@ -92,7 +92,6 @@ jobs:
     steps:
     - name: Checkout Repository
       id: checkout_repository
-      run: echo 'No build script found. Skipping build.'
       uses: actions/checkout@main
     - name: Setup Python
       id: setup_python

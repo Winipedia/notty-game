@@ -53,8 +53,6 @@ jobs:
     - name: Add Dependency Updates To Git
       id: add_dependency_updates_to_git
       run: git add pyproject.toml poetry.lock
-      env:
-        REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
     - name: Protect Repository
       id: protect_repository
       run: poetry run pyrig protect-repo
