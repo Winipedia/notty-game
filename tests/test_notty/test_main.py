@@ -1,5 +1,6 @@
 """test module."""
 
+import pytest
 from pyrig.dev.configs.pyproject import PyprojectConfigFile
 from pyrig.src.os.os import run_subprocess
 
@@ -11,3 +12,51 @@ def test_main() -> None:
         "utf-8"
     )
     assert project_name in stdout
+
+
+@pytest.mark.skip(reason="Won't test UI")
+def test_run() -> None:
+    """Test function."""
+    raise NotImplementedError
+
+
+@pytest.mark.skip(reason="Won't test UI")
+def test_create_window() -> None:
+    """Test function."""
+    raise NotImplementedError
+
+
+@pytest.mark.skip(reason="Won't test UI")
+def test_init_game() -> None:
+    """Test function."""
+    raise NotImplementedError
+
+
+@pytest.mark.skip(reason="Won't test UI")
+def test_get_players() -> None:
+    """Test function."""
+    raise NotImplementedError
+
+
+@pytest.mark.skip(reason="Won't test UI")
+def test_show_deck() -> None:
+    """Test function."""
+    raise NotImplementedError
+
+
+@pytest.mark.skip(reason="Won't test UI")
+def test_show_players() -> None:
+    """Test function."""
+    raise NotImplementedError
+
+
+@pytest.mark.skip(reason="Won't test UI")
+def test_show_player_with_hand() -> None:
+    """Test function."""
+    raise NotImplementedError
+
+
+@pytest.mark.skip(reason="Won't test UI")
+def test_run_event_loop() -> None:
+    """Test function."""
+    raise NotImplementedError
