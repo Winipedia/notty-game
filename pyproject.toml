@@ -1,6 +1,6 @@
 [project]
 name = "notty"
-version = "0.2.6"
+version = "0.2.7"
 description = "A simple card game called Notty using Pygame"
 authors = [
     {name = "Winipedia", email = "win.steveker@gmx.de"},
