@@ -1,7 +1,9 @@
 """Main entrypoint for the project."""
 
 import pygame
+from pyrig.dev.artifacts.resources.resource import get_resource_path
 
+from notty.dev.artifacts import resources
 from notty.src.card import Color
 from notty.src.consts import ANTI_ALIASING, APP_HEIGHT, APP_NAME, APP_WIDTH
 from notty.src.deck import Deck
@@ -25,8 +27,11 @@ def run() -> None:
     # initialize game
     game = init_game()
 
+    # load background image
+    background = load_background()
+
     # run the event loop
-    run_event_loop(screen, game)
+    run_event_loop(screen, game, background)
 
 
 def create_window() -> pygame.Surface:
@@ -35,6 +40,18 @@ def create_window() -> pygame.Surface:
     # set the title
     pygame.display.set_caption(APP_NAME)
     return screen
+
+
+def load_background() -> pygame.Surface:
+    """Load and scale the background image."""
+    # Get the path to the icon.png file
+    icon_path = get_resource_path("icon.png", resources)
+
+    # Load the image
+    background = pygame.image.load(icon_path)
+
+    # Scale it to fit the window
+    return pygame.transform.scale(background, (APP_WIDTH, APP_HEIGHT))
 
 
 def init_game() -> Game:
@@ -166,23 +183,25 @@ def show_player_with_hand(
         screen.blit(number_text, number_rect)
 
 
-def run_event_loop(screen: pygame.Surface, game: Game) -> None:
+def run_event_loop(
+    screen: pygame.Surface, game: Game, background: pygame.Surface
+) -> None:
     """Run the main event loop.
 
     Args:
         screen: The pygame display surface.
         game: The game instance.
+        background: The background image surface.
     """
-    running = True
     clock = pygame.time.Clock()
 
-    while running:
+    while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                return
 
-        # Clear screen
-        screen.fill((25, 78, 78))  # Teal background (like a card table)
+        # Draw background image
+        screen.blit(background, (0, 0))
 
         # Display deck
         show_deck(screen, game.deck)
