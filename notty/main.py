@@ -181,14 +181,15 @@ def simulate_first_shuffle_and_deal(
 
     # Dealing animation - show cards moving from deck to players
     cards_per_player = game.INITIAL_HAND_SIZE
-    num_players = len(game.players)
+    display_order = get_player_display_order(game)
+    num_players = len(display_order)
 
     for card_num in range(cards_per_player):
         for player_idx in range(num_players):
             # Animate card moving from deck to player
             deal_frames = 15
 
-            # Calculate player position
+            # Calculate player position (using display order)
             player_width = app_width // num_players
             player_x = player_idx * player_width
 
@@ -302,10 +303,29 @@ def show_deck(
     screen.blit(label_text, label_rect)
 
 
+def get_player_display_order(game: Game) -> list[Player]:
+    """Get the display order of players with human in the middle.
+
+    Args:
+        game: The game instance.
+
+    Returns:
+        List of players in display order (left to right).
+    """
+    # Separate human and computer players
+    all_players = game.players
+    human_player = next(p for p in all_players if p.is_human)
+    display_order = [p for p in all_players if not p.is_human]
+
+    display_order.insert(1, human_player)
+
+    return display_order
+
+
 def show_players(
     screen: pygame.Surface, game: Game, app_width: int, app_height: int
 ) -> None:
-    """Display all players.
+    """Display all players with human player in the middle.
 
     Args:
         screen: The pygame display surface.
@@ -313,11 +333,14 @@ def show_players(
         app_width: Width of the window.
         app_height: Height of the window.
     """
+    # Get display order with human in the middle
+    display_order = get_player_display_order(game)
+
     # Position players horizontally across the bottom of the screen
     num_players = len(game.players)
     player_width = app_width // num_players
 
-    for i, player in enumerate(game.players):
+    for i, player in enumerate(display_order):
         player_x = i * player_width
         show_player_with_hand(screen, player, player_x, app_height)
 
