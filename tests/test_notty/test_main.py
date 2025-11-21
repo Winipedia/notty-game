@@ -84,3 +84,9 @@ def test_simulate_first_shuffle_and_deal() -> None:
 def test_get_player_display_order() -> None:
     """Test function."""
     raise NotImplementedError
+
+
+@pytest.mark.skip(reason="Won't test UI")
+def test_show_actions() -> None:
+    """Test function."""
+    raise NotImplementedError
