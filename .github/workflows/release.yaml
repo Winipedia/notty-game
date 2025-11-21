@@ -92,9 +92,10 @@ jobs:
       fail-fast: true
     runs-on: ${{ matrix.os }}
     steps:
-    - name: Checkout Repository
-      id: checkout_repository
+    - name: No Builder Defined
+      id: no_builder_defined
       uses: actions/checkout@main
+      run: echo 'No non-abstract builders defined. Skipping build.'
     - name: Setup Python
       id: setup_python
       uses: actions/setup-python@main
