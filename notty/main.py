@@ -43,12 +43,41 @@ def init_game() -> Game:
 
 
 def get_players() -> list[Player]:
-    """Get the players."""
-    # Needed: Make players configurable by the real player
-    player_1 = Player("Human", is_human=True)
-    player_2 = Player("Computer 1", is_human=False)
-    player_3 = Player("Computer 2", is_human=False)
-    return [player_1, player_2, player_3]
+    """Ask the real player which position they want to play as.
+
+    This lets the human choose to be Player 1, 2, or 3 at the start.
+    """
+
+    print("DEBUG: get_players was called")
+
+
+    print("Choose which player you want to be:")
+    print("  1 = Player 1")
+    print("  2 = Player 2")
+    print("  3 = Player 3")
+
+    choice = ""
+    while choice not in {"1", "2", "3"}:
+        choice = input("Your choice (1 / 2 / 3): ").strip()
+        if choice not in {"1", "2", "3"}:
+            print("Please enter 1, 2, or 3.")
+
+    human_index = int(choice) - 1  # 0, 1, or 2
+
+    players: list[Player] = []
+    computer_count = 1
+
+    for i in range(3):
+        if i == human_index:
+            # This position will be controlled by the real player
+            players.append(Player("Human", is_human=True))
+        else:
+            # Other positions are computer players
+            players.append(Player(f"Computer {computer_count}", is_human=False))
+            computer_count += 1
+
+    return players
+
 
 
 def show_deck(screen: pygame.Surface, deck: Deck) -> None:
