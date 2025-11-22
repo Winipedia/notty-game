@@ -23,34 +23,240 @@ COLOR_MAP = {
     CARD_BACK_COLOR: (100, 100, 120),  # Neutral gray-blue for deck
 }
 
+# ---------------------------------------------------------
+# MAIN EXECUTION FLOW (Added by Hanmiao for UI Assessment)
+# ---------------------------------------------------------
 
-def main() -> None:
-    """Start the notty game."""
+def main():
+    # 1. 初始化 / Initialize Pygame
     pygame.init()
+    
+    # 2. 设置窗口 / Setup Window
+    app_width = 1200
+    app_height = 800
+    screen = pygame.display.set_mode((app_width, app_height))
+    pygame.display.set_caption("Notty Game - Dev Build")
 
-    run()
+    # 3. 显示主菜单 / Show Main Menu
+    # 调用前面定义的UI函数
+    try:
+        choice = show_main_menu(screen, app_width, app_height)
+    except NameError:
+        print("Menu function missing, defaulting to start.")
+        choice = "start"
 
-    pygame.quit()
-
-
-def run() -> None:
-    """Run the game."""
-    # Get screen dimensions
-    app_width, app_height = get_window_size()
-
-    screen = create_window(app_width, app_height)
-
-    # initialize game
+    # 4. 处理菜单选择 / Handle Selection
+    if choice is None:
+        pygame.quit()
+        sys.exit(0)
+        
+    elif choice == "tutorial":
+        print("Starting Tutorial Mode...")
+        run_tutorial_placeholder(screen, app_width, app_height)
+        # 教程结束后继续游戏，或者可以直接退出
+        
+    # 5. 进入核心游戏逻辑 / Enter Core Gameplay
+    # (Existing logic by teammates)
+    print("Initializing Core Game...")
     game = init_game()
-
-    # load background image
     background = load_background(app_width, app_height)
-
-    # simulate first shuffle and deal
     simulate_first_shuffle_and_deal(screen, game, background, app_width, app_height)
-
-    # run the event loop
     run_event_loop(screen, game, background, app_width, app_height)
+
+
+# ---------------------------------------------------------
+# UI & MENU FUNCTIONS (Added by Hanmiao for UI Assessment)
+# ---------------------------------------------------------
+
+def show_main_menu(screen, app_width, app_height):
+    """
+    Displays the graphical main menu.
+    Features:
+    - Loads external assets via pathlib for cross-platform compatibility.
+    - Distinct visual style with promo art.
+    - Interactive buttons for Start/Tutorial.
+    """
+    import pygame
+    import sys
+    from pathlib import Path
+
+    clock = pygame.time.Clock()
+
+    # --- 资源加载 / Asset Loading ---
+    # 使用 pathlib 确保路径兼容性，定位到 dev/artifacts/.../sprites
+    # Ensure correct path to assets regardless of OS or execution directory
+    current_dir = Path(__file__).resolve().parent
+    promo_path = current_dir / "dev" / "artifacts" / "resources" / "sprites" / "notty_promo.png"
+
+    try:
+        # 尝试加载图片，如果失败则使用紫色占位块
+        # Try to load the image; fallback to a colored block if missing
+        if not promo_path.exists():
+            print(f"Warning: Promo image not found at {promo_path}")
+            raise FileNotFoundError("Asset missing")
+            
+        promo_img = pygame.image.load(str(promo_path)).convert_alpha()
+    except Exception as e:
+        # 容错处理 / Error Handling
+        print(f"UI Asset Error: {e}. Using placeholder.")
+        promo_img = pygame.Surface((int(app_width*0.6)-40, int(app_height*0.8)))
+        promo_img.fill((200, 180, 230))
+
+    # --- 字体与布局 / Fonts & Layout ---
+    font = pygame.font.SysFont("arial", 26, bold=True)
+    title_font = pygame.font.SysFont("arial", 40, bold=True)
+
+    left_w = int(app_width * 0.62)
+    right_w = app_width - left_w
+    padding = 24
+    btn_w = right_w - padding*2
+    btn_h = 64
+    btn_x = left_w + padding
+    total_btns_h = 4 * btn_h + 3 * 12
+    start_y = (app_height - total_btns_h) // 2
+
+    # 按钮定义 / Button Definitions
+    labels = [("Start Game", "start"),
+              ("Tutorial", "tutorial"),
+              ("Settings", "settings"),
+              ("Quit", "quit")]
+    btn_rects = []
+    for i, (lbl, key) in enumerate(labels):
+        rect = pygame.Rect(btn_x, start_y + i*(btn_h+12), btn_w, btn_h)
+        btn_rects.append((rect, lbl, key))
+
+    # --- 事件循环 / Event Loop ---
+    running = True
+    result = None
+    while running:
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit(0)
+            if e.type == pygame.MOUSEBUTTONUP and e.button == 1:
+                mx, my = e.pos
+                for rect, lbl, key in btn_rects:
+                    if rect.collidepoint((mx, my)):
+                        if key == "quit":
+                            pygame.quit()
+                            sys.exit(0)
+                        result = key
+                        running = False
+
+        # 绘制背景 / Draw Background
+        screen.fill((20,20,28))
+
+        # 绘制左侧宣传图 (自动缩放) / Draw Promo Image
+        promo_w = left_w - 40
+        promo_h = app_height - 120
+        scaled = pygame.transform.smoothscale(promo_img, (promo_w, promo_h))
+        screen.blit(scaled, (20, 60))
+
+        # 绘制右侧面板 / Draw Right Panel
+        right_rect = pygame.Rect(left_w, 0, right_w, app_height)
+        pygame.draw.rect(screen, (12, 12, 18), right_rect)
+
+        # 绘制标题 / Draw Title
+        title_s = title_font.render("Notty Game", True, (230,230,230))
+        screen.blit(title_s, (left_w + 24, 24))
+
+        # 绘制按钮与悬停效果 / Draw Buttons & Hover
+        for rect, lbl, key in btn_rects:
+            mx, my = pygame.mouse.get_pos()
+            hover = rect.collidepoint((mx, my))
+            bg = (70,90,120) if not hover else (90,110,140)
+            pygame.draw.rect(screen, bg, rect, border_radius=8)
+            txt = font.render(lbl, True, (255,255,255))
+            screen.blit(txt, txt.get_rect(center=rect.center))
+
+        pygame.display.flip()
+        clock.tick(60)
+
+    return result
+
+
+def run_tutorial_placeholder(screen, app_width, app_height):
+    """
+    Runs the Tutorial Scene.
+    Currently displays the character sprite (Notty) and introduction text.
+    Designed to be expanded with the full storyboard script.
+    """
+    import pygame
+    from pathlib import Path
+    
+    clock = pygame.time.Clock()
+    
+    # --- 教程立绘加载 / Load Character Sprite ---
+    current_dir = Path(__file__).resolve().parent
+    # 优先加载小写文件名，兼容性更好
+    sprite_path = current_dir / "dev" / "artifacts" / "resources" / "sprites" / "nottystandard.png"
+    
+    try:
+        # 检查文件是否存在，如果不存在尝试大写变体 (Keep fallback for safety)
+        if not sprite_path.exists():
+            alt_path = current_dir / "dev" / "artifacts" / "resources" / "sprites" / "NottyStandard.png"
+            if alt_path.exists():
+                sprite_path = alt_path
+            else:
+                print(f"Warning: Sprite not found at {sprite_path}")
+
+        notty_img = pygame.image.load(str(sprite_path)).convert_alpha()
+    except Exception as e:
+        # 失败时显示占位符，防止游戏崩溃
+        print(f"Tutorial Asset Error: {e}")
+        notty_img = pygame.Surface((300,400))
+        notty_img.fill((220,200,220))
+
+    font = pygame.font.SysFont("arial", 28, bold=True)
+    btn_rect = pygame.Rect(app_width//2 - 120, app_height - 140, 240, 64)
+
+    showing = True
+    while showing:
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
+                pygame.quit()
+                return False
+            if e.type == pygame.MOUSEBUTTONUP and e.button == 1:
+                if btn_rect.collidepoint(e.pos):
+                    showing = False  # End tutorial
+
+        screen.fill((25,25,30))
+        
+        # 绘制立绘 / Draw Sprite
+        if notty_img:
+            n_w = int(app_width * 0.35)
+            img_w = notty_img.get_width() if notty_img.get_width() > 0 else 1
+            n_h = int(n_w * (notty_img.get_height() / img_w))
+            scaled = pygame.transform.smoothscale(notty_img, (n_w, n_h))
+            screen.blit(scaled, (40, app_height//2 - n_h//2))
+
+        # 绘制对话框 / Draw Text Box
+        text = "Hello! This is the tutorial placeholder. Click Begin Battle to start the tutorial battle."
+        wrapped = []
+        words = text.split(" ")
+        line = ""
+        for w in words:
+            if len(line + " " + w) > 50:
+                wrapped.append(line)
+                line = w
+            else:
+                line = (line + " " + w).strip()
+        wrapped.append(line)
+
+        tx = app_width//2
+        ty = 120
+        for i, ln in enumerate(wrapped):
+            txt_s = font.render(ln, True, (230,230,230))
+            screen.blit(txt_s, (tx, ty + i*34))
+
+        # 绘制按钮 / Draw Button
+        pygame.draw.rect(screen, (70,90,120), btn_rect, border_radius=8)
+        txt_s = font.render("Begin Battle", True, (255,255,255))
+        screen.blit(txt_s, txt_s.get_rect(center=btn_rect.center))
+
+        pygame.display.flip()
+        clock.tick(60)
+    return True
 
 
 def run_event_loop(
