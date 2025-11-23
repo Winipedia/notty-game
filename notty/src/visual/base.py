@@ -41,6 +41,10 @@ class Visual(ABC):
         png = pygame.image.load(self.get_png_path())
         self.png = pygame.transform.scale(png, (self.width, self.height))
 
+    def get_center(self) -> tuple[int, int]:
+        """Get the center of the visual element."""
+        return self.x + self.width // 2, self.y + self.height // 2
+
     def move(self, x: int, y: int) -> None:
         """Move the visual element.
 

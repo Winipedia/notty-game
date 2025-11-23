@@ -33,9 +33,9 @@ class VisualDeck(Visual):
         super().draw()
         # Cards stay hidden behind the deck - only draw the deck image
         # draw the number of cards in the deck in black
-        font = pygame.font.Font(None, 36)
+        font = pygame.font.Font(None, 100)
         text = font.render(str(self.size()), ANTI_ALIASING, (0, 0, 0))
-        self.screen.blit(text, (self.x, self.y))
+        self.screen.blit(text, (self.x + 10, self.y + 10))
 
     def __init__(
         self,
@@ -61,7 +61,7 @@ class VisualDeck(Visual):
         for color in Color.get_all_colors():
             for number in Number.get_all_numbers():
                 for _ in range(self.NUM_DUPLICATES):
-                    self.cards.append(
+                    self.add_card(
                         VisualCard(color, number, DECK_POS_X, DECK_POS_Y, self.screen)
                     )
 
@@ -121,7 +121,9 @@ class VisualDeck(Visual):
             card: VisualCard to add back to the deck.
         """
         self.cards.append(card)
-        card.move(DECK_POS_X, DECK_POS_Y)
+        # move the card to the middle of the deck
+        x, y = self.get_center()
+        card.move(x, y)
         self.shuffle()
 
     def is_empty(self) -> bool:
