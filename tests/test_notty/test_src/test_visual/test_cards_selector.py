@@ -39,6 +39,12 @@ class TestSubmitButton:
 class TestCardsSelector:
     """Test class."""
 
+    def test__get_button_dimensions(self) -> None:
+        """Test method."""
+
+    def test__get_dialog_dimensions(self) -> None:
+        """Test method."""
+
     def test___init__(self) -> None:
         """Test method."""
 
