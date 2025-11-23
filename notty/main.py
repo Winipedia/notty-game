@@ -1,7 +1,6 @@
 """Main entrypoint for the project."""
 
 import logging
-import sys
 
 import pygame
 
@@ -12,6 +11,7 @@ from notty.src.computer_action_selection import (
 from notty.src.consts import APP_HEIGHT, APP_NAME, APP_WIDTH
 from notty.src.player_selection import get_players
 from notty.src.visual.game import VisualGame
+from notty.src.visual.player import VisualPlayer
 from notty.src.visual.winner_display import WinnerDisplay
 
 
@@ -27,21 +27,36 @@ def main() -> None:
     pygame.init()
 
     try:
-        run()
+        # Main loop - allows restarting the game
+        while True:
+            result = run()
+
+            # If user chose to quit, exit
+            if result == "quit":
+                break
+            # If result is "new_game", loop continues and starts fresh
+
     finally:
         # Save Q-Learning agent before exiting
         save_qlearning_agent()
         pygame.quit()
 
 
-def run() -> None:
-    """Run the game."""
+def run() -> str:
+    """Run the game.
+
+    Returns:
+        "new_game" if user wants to restart, "quit" if user wants to exit.
+    """
+    # Clear active players list to prevent positioning issues on restart
+    VisualPlayer.ACTIVE_PLAYERS.clear()
+
     screen = get_screen()
     players = get_players(screen)
-
     game = VisualGame(screen, players)
-    # run the event loop
-    run_event_loop(game)
+
+    # Run the event loop and return the result
+    return run_event_loop(game)
 
 
 def get_screen() -> pygame.Surface:
@@ -57,35 +72,21 @@ def get_screen() -> pygame.Surface:
     return screen
 
 
-def simulate_first_shuffle_and_deal() -> None:
-    """Simulate the first shuffle and deal.
-
-    Args:
-        screen: The pygame display surface.
-        game: The game instance.
-        background: The background image surface.
-        app_width: Width of the window.
-        app_height: Height of the window.
-    """
-
-
-def run_event_loop(game: VisualGame) -> None:
+def run_event_loop(game: VisualGame) -> str:
     """Run the main event loop.
 
     Args:
-        screen: The pygame display surface.
         game: The game instance.
-        background: The background image surface.
-        app_width: Width of the window.
-        app_height: Height of the window.
+
+    Returns:
+        "new_game" if user wants to start a new game, "quit" if user wants to quit.
     """
     clock = pygame.time.Clock()
 
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+                return "quit"
             if game.all_players_have_no_cards():
                 VisualGame.distribute_starting_cards(game)
                 continue
@@ -104,27 +105,29 @@ def run_event_loop(game: VisualGame) -> None:
             game.draw()
             pygame.display.flip()
 
-            # Show winner and reset game
-            show_winner(game)
-            break
+            # Show winner and get user choice
+            return show_winner(game)
 
         # Update display
         pygame.display.flip()
         clock.tick(60)  # 60 FPS
 
 
-def show_winner(game: VisualGame) -> None:
-    """Show the winner display and reset the game.
+def show_winner(game: VisualGame) -> str:
+    """Show the winner display and get user choice.
 
     Args:
         game: The game instance.
+
+    Returns:
+        "new_game" if user wants to start a new game, "quit" if user wants to quit.
     """
     if game.winner is None:
-        return
+        return "quit"
 
     # Show winner display
     winner_display = WinnerDisplay(game.screen, game.winner)
-    winner_display.show()
+    return winner_display.show()
 
 
 if __name__ == "__main__":

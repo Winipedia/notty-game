@@ -31,11 +31,45 @@ class WinnerDisplay:
         img = pygame.image.load(png_path)
         self.winner_image = pygame.transform.scale(img, (200, 200))
 
-    def show(self) -> None:
-        """Show the winner display and wait for user to click to continue.
+        # Button properties
+        self.button_width = 250
+        self.button_height = 60
+        self.button_spacing = 20
+
+        # Calculate button positions
+        dialog_width = 600
+        dialog_height = 550
+        dialog_x = (APP_WIDTH - dialog_width) // 2
+        dialog_y = (APP_HEIGHT - dialog_height) // 2
+
+        # New Game button
+        self.new_game_button_rect = pygame.Rect(
+            dialog_x + (dialog_width - self.button_width) // 2,
+            dialog_y + dialog_height - 140,
+            self.button_width,
+            self.button_height,
+        )
+
+        # Quit button
+        self.quit_button_rect = pygame.Rect(
+            dialog_x + (dialog_width - self.button_width) // 2,
+            dialog_y + dialog_height - 140 + self.button_height + self.button_spacing,
+            self.button_width,
+            self.button_height,
+        )
+
+        # Hover states
+        self.new_game_hovered = False
+        self.quit_hovered = False
+
+    def show(self) -> str:
+        """Show the winner display and wait for user to click a button.
 
         This displays a congratulations message and waits for the user to
-        click anywhere to dismiss the dialog and start a new game.
+        click either "Start New Game" or "Quit".
+
+        Returns:
+            "new_game" if user clicked Start New Game, "quit" if user clicked Quit.
         """
         clock = pygame.time.Clock()
 
@@ -43,14 +77,24 @@ class WinnerDisplay:
             # Handle events
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
-                    raise SystemExit
+                    return "quit"
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    # Any click dismisses the dialog
-                    return
-                if event.type == pygame.KEYDOWN:
-                    # Any key press dismisses the dialog
-                    return
+                    mouse_x, mouse_y = pygame.mouse.get_pos()
+
+                    # Check if New Game button was clicked
+                    if self.new_game_button_rect.collidepoint(mouse_x, mouse_y):
+                        return "new_game"
+
+                    # Check if Quit button was clicked
+                    if self.quit_button_rect.collidepoint(mouse_x, mouse_y):
+                        return "quit"
+
+            # Update hover states
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            self.new_game_hovered = self.new_game_button_rect.collidepoint(
+                mouse_x, mouse_y
+            )
+            self.quit_hovered = self.quit_button_rect.collidepoint(mouse_x, mouse_y)
 
             # Draw
             self._draw()
@@ -69,7 +113,7 @@ class WinnerDisplay:
 
         # Draw dialog background
         dialog_width = 600
-        dialog_height = 500
+        dialog_height = 550
         dialog_x = (APP_WIDTH - dialog_width) // 2
         dialog_y = (APP_HEIGHT - dialog_height) // 2
 
@@ -132,12 +176,53 @@ class WinnerDisplay:
         )
         self.screen.blit(name_text, name_rect)
 
-        # Draw instruction to continue
-        instruction_font = pygame.font.Font(None, 36)
-        instruction_text = instruction_font.render(
-            "Click anywhere to continue", ANTI_ALIASING, (180, 180, 180)
+        # Draw buttons
+        self._draw_button(
+            self.new_game_button_rect,
+            "Start New Game",
+            hovered=self.new_game_hovered,
+            normal_color=(50, 150, 50),  # Green
+            hover_color=(70, 200, 70),  # Lighter green on hover
         )
-        instruction_rect = instruction_text.get_rect(
-            center=(APP_WIDTH // 2, dialog_y + dialog_height - 40)
+
+        self._draw_button(
+            self.quit_button_rect,
+            "Quit",
+            hovered=self.quit_hovered,
+            normal_color=(150, 50, 50),  # Red
+            hover_color=(200, 70, 70),  # Lighter red on hover
         )
-        self.screen.blit(instruction_text, instruction_rect)
+
+    def _draw_button(
+        self,
+        rect: pygame.Rect,
+        text: str,
+        *,
+        hovered: bool,
+        normal_color: tuple[int, int, int],
+        hover_color: tuple[int, int, int],
+    ) -> None:
+        """Draw a button with hover effect.
+
+        Args:
+            rect: The button rectangle.
+            text: The button text.
+            hovered: Whether the button is hovered.
+            normal_color: The normal button color.
+            hover_color: The hover button color.
+        """
+        # Choose color based on hover state
+        color = hover_color if hovered else normal_color
+
+        # Draw button background
+        pygame.draw.rect(self.screen, color, rect, border_radius=10)
+
+        # Draw button border
+        border_color = (255, 215, 0) if hovered else (200, 200, 100)
+        pygame.draw.rect(self.screen, border_color, rect, 3, border_radius=10)
+
+        # Draw button text
+        button_font = pygame.font.Font(None, 48)
+        button_text = button_font.render(text, ANTI_ALIASING, (255, 255, 255))
+        text_rect = button_text.get_rect(center=rect.center)
+        self.screen.blit(button_text, text_rect)
