@@ -138,7 +138,7 @@ class ActionButton:
         )
 
         # Draw button text on the surface - scale font size based on button height
-        font_size = int(self.height * 0.35)  # 35% of button height
+        font_size = int(self.height * 0.5)  # 70% of button height (doubled from 35%)
         font = pygame.font.Font(None, font_size)
         text_surface = font.render(self.text, ANTI_ALIASING, text_color)
         text_rect = text_surface.get_rect(center=(self.width // 2, self.height // 2))
