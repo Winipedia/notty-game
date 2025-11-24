@@ -233,7 +233,10 @@ class PlayerNameSelector(BaseSelector[str]):
                         if button.is_clicked(mouse_x, mouse_y):
                             if self.needs_submit:
                                 # Multi-select mode: toggle selection
-                                button.toggle_selection()
+                                current_count = len(self._get_selected_items())
+                                button.toggle_selection(
+                                    current_count, self.max_selections
+                                )
                             else:
                                 # Single-select mode: return immediately
                                 return button.item

@@ -296,7 +296,9 @@ class CardsSelector(BaseSelector["VisualCard"]):
                     # Check if any card button was clicked
                     for button in self.buttons:
                         if button.is_clicked(mouse_x, mouse_y):
-                            button.toggle_selection()
+                            button.toggle_selection(
+                                len(self._get_selected_items()), self.max_selections
+                            )
                             self._update_submit_button_state()
                             break
 
