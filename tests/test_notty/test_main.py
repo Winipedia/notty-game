@@ -31,3 +31,7 @@ def test_run_event_loop() -> None:
 
 def test_show_winner() -> None:
     """Test function."""
+
+
+def test_start_background_music() -> None:
+    """Test function."""
