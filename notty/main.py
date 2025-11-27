@@ -4,6 +4,8 @@ import logging
 
 import pygame
 
+from pathlib import Path
+
 from notty.src.computer_action_selection import (
     computer_chooses_action,
     save_qlearning_agent,
@@ -15,6 +17,37 @@ from notty.src.visual.player import VisualPlayer
 from notty.src.visual.winner_display import WinnerDisplay
 
 
+def get_resource_path(relative: str) -> str:
+    """Build absolute path to a resource inside the project."""
+    base_dir = Path(__file__).resolve().parent   # foloder notty main.py
+    return str(base_dir / relative)
+
+
+def start_background_music() -> None:
+    """Start looping background music if possible."""
+    try:
+        
+        
+        music_path = Path(
+            get_resource_path(
+                "dev/artifacts/resources/music/Connected Hearts (long).mp3"
+            )
+        )
+
+        # Check messages  
+        print(f"[MUSIC] Path: {music_path}")
+        print(f"[MUSIC] Exists? {music_path.exists()}")
+
+        if not pygame.mixer.get_init():
+            pygame.mixer.init()
+
+        pygame.mixer.music.load(str(music_path))
+        pygame.mixer.music.set_volume(0.4)
+        pygame.mixer.music.play(-1)  # # loop forever
+        print("[MUSIC] Playing background music")
+    except Exception as exc:
+        print(f"[MUSIC] Could not play music: {exc}")
+
 def main() -> None:
     """Start the notty game."""
     # Configure logging
@@ -25,6 +58,8 @@ def main() -> None:
     )
 
     pygame.init()
+    start_background_music()
+
 
     try:
         # Main loop - allows restarting the game
